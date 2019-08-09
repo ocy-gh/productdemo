@@ -1,25 +1,51 @@
 package com.example.productdemo.client;
 
+import com.intuit.oauth2.client.OAuth2PlatformClient;
 import com.intuit.oauth2.config.Environment;
 import com.intuit.oauth2.config.OAuth2Config;
-import com.intuit.oauth2.config.Scope;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.annotation.PostConstruct;
 
+/**
+ *
+ * @author dderose
+ *
+ */
+@Service
+@PropertySource(value="classpath:/application.properties", ignoreResourceNotFound=true)
 public class OAuth2PlatformClientFactory {
-    //Prepare the config
-    OAuth2Config oauth2Config = new OAuth2Config.OAuth2ConfigBuilder("clientId", "clientSecret")
-            .callDiscoveryAPI(Environment.SANDBOX).buildConfig();
 
-    //Generate the CSRF token
-    String csrf = oauth2Config.generateCSRFToken();
+    private final org.springframework.core.env.Environment env;
 
-    //Prepare scopes
-    List<Scope> scopes = new ArrayList<Scope>();
-    scopes.add(Scope.Accounting); // add as needed
+    private OAuth2PlatformClient client;
+    private OAuth2Config oauth2Config;
 
-    //Get the authorization URL
-    String url = oauth2Config.prepareUrl(scopes, redirectUri, csrf); //redirectUri - pass the callback url
+    public OAuth2PlatformClientFactory(org.springframework.core.env.Environment env) {
+        this.env = env;
+    }
+
+    @PostConstruct
+    public void init() {
+        // intitialize a single thread executor, this will ensure only one thread processes the queue
+        oauth2Config = new OAuth2Config.OAuth2ConfigBuilder(env.getProperty("OAuth2AppClientId"), env.getProperty("OAuth2AppClientSecret")) //set client id, secret
+                .callDiscoveryAPI(Environment.SANDBOX) // call discovery API to populate urls
+                .buildConfig();
+        client  = new OAuth2PlatformClient(oauth2Config);
+    }
+
+
+    public OAuth2PlatformClient getOAuth2PlatformClient()  {
+        return client;
+    }
+
+    public OAuth2Config getOAuth2Config()  {
+        return oauth2Config;
+    }
+
+    public String getPropertyValue(String propertyName) {
+        return env.getProperty(propertyName);
+    }
 
 }

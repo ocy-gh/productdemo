@@ -1,17 +1,50 @@
 package com.example.productdemo.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.example.productdemo.client.OAuth2PlatformClientFactory;
 import com.example.productdemo.entity.po.*;
 import com.example.productdemo.http.HttpRequest;
+import com.intuit.oauth2.config.OAuth2Config;
+import com.intuit.oauth2.config.Scope;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.view.RedirectView;
 
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-public class ProductServiceController {
+public class HomeController {
+    private final OAuth2PlatformClientFactory factory;
+
+    public HomeController(OAuth2PlatformClientFactory factory) {
+        this.factory = factory;
+    }
+
+    @GetMapping("/c")
+    public View connectToQuickbooks(HttpSession session) {
+        System.out.println("inside connectToQuickbooks");
+        OAuth2Config oauth2Config = factory.getOAuth2Config();
+
+        String redirectUri = factory.getPropertyValue("OAuth2AppRedirectUri");
+
+        String csrf = oauth2Config.generateCSRFToken();
+        session.setAttribute("csrfToken", csrf);
+
+        try {
+            List<Scope> scopes = new ArrayList<>();
+            scopes.add(Scope.Accounting);
+            return new RedirectView(oauth2Config.prepareUrl(scopes, redirectUri, csrf), true, true, false);
+        } catch (com.intuit.oauth2.exception.InvalidRequestException e) {
+            System.out.println("Exception calling connectToQuickbooks ");
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 
     @GetMapping("/invoice")
     public void createInvoice() {
