@@ -11,6 +11,8 @@ public class Line {
     private SalesItemLine salesItemLine;
     private GroupLine groupLine;
     private DescriptionOnlyLine descriptionOnlyLine;
+    private DiscountLine discountLine;
+    private SubTotalLine subTotalLine;
 
     public String getId() {
         return id;
@@ -82,5 +84,21 @@ public class Line {
 
     public void setDescriptionOnlyLine(DescriptionOnlyLine descriptionOnlyLine) {
         this.descriptionOnlyLine = descriptionOnlyLine;
+    }
+
+    public DiscountLine getDiscountLine() {
+        return discountLine;
+    }
+
+    public void setDiscountLine(DiscountLine discountLine) {
+        this.discountLine = discountLine;
+    }
+
+    public SubTotalLine getSubTotalLine() {
+        return subTotalLine;
+    }
+
+    public void setSubTotalLine(SubTotalLine subTotalLine) {
+        this.subTotalLine = subTotalLine;
     }
 }

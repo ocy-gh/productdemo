@@ -1,5 +1,6 @@
 package com.example.productdemo.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.example.productdemo.entity.po.*;
 import com.example.productdemo.http.HttpRequest;
@@ -44,9 +45,33 @@ public class ProductServiceController {
 
 
         HttpRequest httpRequest = new HttpRequest();
-        httpRequest.doPost("/v3/company/4620816365001314160/invoice?minorversion=38", main);
+//        httpRequest.doPost("/v3/company/4620816365001314160/invoice?minorversion=38", main);
+        httpRequest.doPost("/oauth2/v1/tokens/bearer?grant_type=authorization_code", main);
+    }
 
+    @GetMapping("/delete")
+    public void deleteInvoice(){
+        JSONObject del = new JSONObject();
+        del.put("SyncToken", "3");
+        del.put("Id","33");
 
+        System.out.println(del.toString());
+
+        HttpRequest httpRequest = new HttpRequest();
+        httpRequest.doPost("/v3/company/4620816365001314160/invoice?operation=delete&minorversion=38", del);
+
+    }
+
+    @GetMapping("/void")
+    public void voidInvoice(){
+        JSONObject v = new JSONObject();
+        v.put("SyncToken", "0");
+        v.put("Id","129");
+
+        System.out.println(v.toString());
+
+        HttpRequest httpRequest = new HttpRequest();
+        httpRequest.doPost("/v3/company/4620816365001314160/invoice?operation=void&minorversion=38", v);
 
     }
 }
