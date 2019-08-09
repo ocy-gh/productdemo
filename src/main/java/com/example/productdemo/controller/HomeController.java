@@ -3,7 +3,12 @@ package com.example.productdemo.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.example.productdemo.client.OAuth2PlatformClientFactory;
 import com.example.productdemo.entity.po.*;
+import com.example.productdemo.helper.InvoiceHelper;
 import com.example.productdemo.http.HttpRequest;
+import com.intuit.ipp.data.Error;
+import com.intuit.ipp.data.Invoice;
+import com.intuit.ipp.exception.FMSException;
+import com.intuit.ipp.services.DataService;
 import com.intuit.oauth2.config.OAuth2Config;
 import com.intuit.oauth2.config.Scope;
 
@@ -13,6 +18,7 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpSession;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,8 +52,27 @@ public class HomeController {
         return null;
     }
 
+    @GetMapping("/create_invoice")
+    public String createInvoice() {
+        try {
+            DataService service = DataServiceFactory.getDataService();
+
+            // add invoice
+            Invoice invoice = InvoiceHelper.getInvoiceFields(service);
+            Invoice savedInvoice = service.add(invoice);
+            System.out.println("Invoice created: " + savedInvoice.getId() + " ::invoice doc num: " + savedInvoice.getDocNumber());
+        } catch (FMSException e) {
+            List<Error> list = e.getErrorList();
+            list.forEach(error -> System.out.println("Error while calling entity add:: " + error.getMessage()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return "hey yo";
+    }
+
     @GetMapping("/invoice")
-    public void createInvoice() {
+    public void createInvoi1ce() {
         CustomerRef customerRef = new CustomerRef();
         customerRef.setValue("1");
 

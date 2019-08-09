@@ -61,8 +61,6 @@ public class CallbackController {
                 session.setAttribute("refresh_token", bearerTokenResponse.getRefreshToken());
 
                 // Update your Data store here with user's AccessToken and RefreshToken along with the realmId
-
-
                 model.addAttribute("realmId", realmId);
                 model.addAttribute("auth_code", authCode);
                 model.addAttribute("access_token", bearerTokenResponse.getAccessToken());

@@ -5,6 +5,7 @@ import com.example.productdemo.helper.QBOServiceHelper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intuit.ipp.data.CompanyInfo;
+import com.intuit.ipp.data.Customer;
 import com.intuit.ipp.data.Error;
 import com.intuit.ipp.exception.FMSException;
 import com.intuit.ipp.exception.InvalidTokenException;
@@ -16,37 +17,28 @@ import com.intuit.oauth2.exception.OAuthException;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
-/**
- * @author dderose
- *
- */
 @Controller
-public class QBOController {
+public class CustomerController {
 
     private final OAuth2PlatformClientFactory factory;
     private final QBOServiceHelper helper;
-    private static final String failureMsg="Failed";
+    private static final String failureMsg = "Failed";
 
-    public QBOController(OAuth2PlatformClientFactory factory, QBOServiceHelper helper) {
+    public CustomerController(OAuth2PlatformClientFactory factory, QBOServiceHelper helper) {
         this.factory = factory;
         this.helper = helper;
     }
 
-    /**
-     * Sample QBO API call using OAuth2 tokens
-     *
-     * @param session
-     * @return
-     */
     @ResponseBody
-    @RequestMapping("/getCompanyInfo")
-    public String callQBOCompanyInfo(HttpSession session) {
+    @GetMapping("/getCustomer")
+    public String getCustomer(HttpSession session) {
 
         String realmId = (String)session.getAttribute("realmId");
         if (StringUtils.isEmpty(realmId)) {
@@ -55,23 +47,22 @@ public class QBOController {
         String accessToken = (String)session.getAttribute("access_token");
 
         try {
-
-
             //get DataService
             DataService service = helper.getDataService(realmId, accessToken);
 
             // get all companyinfo
-            String sql = "select * from companyinfo";
+            String sql = "SELECT * FROM CUSTOMER";
             QueryResult queryResult = service.executeQuery(sql);
-            return processResponse(failureMsg, queryResult);
+            String responseString = processResponse(failureMsg, queryResult);
+            JSONObject jsonObject = new JSONObject(responseString);
+            Customer customer = new Customer();
+            customer.setId(jsonObject.getString("id"));
+            customer.setDisplayName(jsonObject.getString("displayName"));
 
-        }
-        /*
-         * Handle 401 status code -
-         * If a 401 response is received, refresh tokens should be used to get a new access token,
-         * and the API call should be tried again.
-         */
-        catch (InvalidTokenException e) {
+            System.out.println("Customer Name: " + customer.getDisplayName());
+            System.out.println("Customer ID: " + customer.getId());
+            return responseString;
+        } catch (InvalidTokenException e) {
             System.out.println("Error while calling executeQuery :: " + e.getMessage());
 
             //refresh tokens
@@ -89,10 +80,17 @@ public class QBOController {
                 DataService service = helper.getDataService(realmId, accessToken);
 
                 // get all companyinfo
-                String sql = "select * from companyinfo";
+                String sql = "SELECT * FROM CUSTOMER WHERE DisplayName = 'Shopee Malaysia'";
                 QueryResult queryResult = service.executeQuery(sql);
-                return processResponse(failureMsg, queryResult);
+                String responseString = processResponse(failureMsg, queryResult);
+                JSONObject jsonObject = new JSONObject(responseString);
+                Customer customer = new Customer();
+                customer.setId(jsonObject.getString("id"));
+                customer.setDisplayName(jsonObject.getString("displayName"));
 
+                System.out.println("Customer Name: " + customer.getDisplayName());
+                System.out.println("Customer ID: " + customer.getId());
+                return "customer";
             } catch (OAuthException e1) {
                 System.out.println("Error while calling bearer token :: " + e.getMessage());
                 return new JSONObject().put("response",failureMsg).toString();
@@ -111,19 +109,17 @@ public class QBOController {
 
     private String processResponse(String failureMsg, QueryResult queryResult) {
         if (!queryResult.getEntities().isEmpty() && queryResult.getEntities().size() > 0) {
-            CompanyInfo companyInfo = (CompanyInfo) queryResult.getEntities().get(0);
-            System.out.println("Companyinfo -> CompanyName: " + companyInfo.getCompanyName());
-            ObjectMapper mapper = new ObjectMapper();
+            Customer customer = (Customer) queryResult.getEntities().get(0);
+
             try {
-                String jsonInString = mapper.writeValueAsString(companyInfo);
-                return jsonInString;
+                return new ObjectMapper().writeValueAsString(customer);
             } catch (JsonProcessingException e) {
                 System.out.println("Exception while getting company info ");
                 e.printStackTrace();
                 return new JSONObject().put("response",failureMsg).toString();
             }
-
         }
+
         return failureMsg;
     }
 
