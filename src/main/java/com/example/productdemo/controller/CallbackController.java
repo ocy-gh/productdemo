@@ -1,6 +1,8 @@
 package com.example.productdemo.controller;
 
 import com.example.productdemo.client.OAuth2PlatformClientFactory;
+import com.example.productdemo.entity.po.StoreApiIntuit;
+import com.example.productdemo.service.IStoreApiIntuitService;
 import com.intuit.oauth2.client.OAuth2PlatformClient;
 import com.intuit.oauth2.data.BearerTokenResponse;
 import com.intuit.oauth2.exception.OAuthException;
@@ -19,9 +21,11 @@ import javax.servlet.http.HttpSession;
 public class CallbackController {
 
     private final OAuth2PlatformClientFactory factory;
+    private final IStoreApiIntuitService storeApiIntuitService;
 
-    public CallbackController(OAuth2PlatformClientFactory factory) {
+    public CallbackController(OAuth2PlatformClientFactory factory, IStoreApiIntuitService storeApiIntuitService) {
         this.factory = factory;
+        this.storeApiIntuitService = storeApiIntuitService;
     }
 
     /**
@@ -59,6 +63,13 @@ public class CallbackController {
 
                 session.setAttribute("access_token", bearerTokenResponse.getAccessToken());
                 session.setAttribute("refresh_token", bearerTokenResponse.getRefreshToken());
+
+                StoreApiIntuit storeApiIntuit = new StoreApiIntuit();
+                storeApiIntuit.setRealmId(realmId);
+                storeApiIntuit.setAuthCode(authCode);
+                storeApiIntuit.setAccess_token(bearerTokenResponse.getAccessToken());
+                storeApiIntuit.setRefresh_token(bearerTokenResponse.getRefreshToken());
+                storeApiIntuitService.insert(storeApiIntuit);
 
                 // Update your Data store here with user's AccessToken and RefreshToken along with the realmId
                 model.addAttribute("realmId", realmId);

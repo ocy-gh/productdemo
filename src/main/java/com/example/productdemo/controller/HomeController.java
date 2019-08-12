@@ -103,8 +103,7 @@ public class HomeController {
 
 
         HttpRequest httpRequest = new HttpRequest();
-//        httpRequest.doPost("/v3/company/4620816365001314160/invoice?minorversion=38", main);
-        httpRequest.doPost("/oauth2/v1/tokens/bearer?grant_type=authorization_code", main);
+        httpRequest.doPost("/v3/company/4620816365001314160/invoice?minorversion=38", main);
     }
 
     @GetMapping("/delete")

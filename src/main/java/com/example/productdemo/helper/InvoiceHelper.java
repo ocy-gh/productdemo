@@ -1,19 +1,17 @@
 package com.example.productdemo.helper;
 
+import com.example.productdemo.entity.po.CustomerRef;
+import com.intuit.ipp.data.*;
+import com.intuit.ipp.exception.FMSException;
+import com.intuit.ipp.services.DataService;
+import com.intuit.ipp.util.DateUtils;
+import com.intuit.oauth2.data.Address;
+import org.apache.commons.lang.RandomStringUtils;
+
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.example.productdemo.entity.po.CustomerRef;
-import com.intuit.ipp.data.*;
-import com.intuit.oauth2.data.Address;
-import org.apache.commons.lang.RandomStringUtils;
-
-import com.intuit.ipp.exception.FMSException;
-import com.intuit.ipp.services.DataService;
-import com.intuit.ipp.util.DateUtils;
-
 /**
  * @author dderose
  *
@@ -26,8 +24,6 @@ public final class InvoiceHelper {
 
     public static Invoice getInvoiceFields(DataService service) throws FMSException, ParseException {
         Invoice invoice = new Invoice();
-        /*
-
 
         // Mandatory Fields
         invoice.setDocNumber(RandomStringUtils.randomAlphanumeric(5));
@@ -41,7 +37,7 @@ public final class InvoiceHelper {
         Customer customer = CustomerHelper.getCustomer(service);
         CustomerRef customerRef = new CustomerRef();
         customerRef.setValue("");
-        invoice.setCustomerRef("Shopee Malaysia");
+//        invoice.setCustomerRef("Shopee Malaysia");
 
         invoice.setPrivateNote("Testing");
         invoice.setTxnStatus("Payable");
@@ -65,7 +61,7 @@ public final class InvoiceHelper {
 
         SalesItemLineDetail silDetails = new SalesItemLineDetail();
 
-        Address adress = new Address();
+        Address address = new Address();
 
         Item item = ItemHelper.getItem(service);
         silDetails.setItemRef(ItemHelper.getItemRef(item));
@@ -79,7 +75,7 @@ public final class InvoiceHelper {
         invoice.setPrintStatus(PrintStatusEnum.NEED_TO_PRINT);
         invoice.setTotalAmt(new BigDecimal("10000"));
         invoice.setFinanceCharge(false);
-*/
+
         return invoice;
     }
 }
