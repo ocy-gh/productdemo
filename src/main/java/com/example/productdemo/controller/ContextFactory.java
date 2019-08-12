@@ -13,16 +13,8 @@ import com.intuit.ipp.security.OAuth2Authorizer;
 import com.intuit.ipp.security.OAuthAuthorizer;
 import com.intuit.ipp.util.Logger;
 
-/**
- *
- * @author dderose
- *
- */
-
 public class ContextFactory {
-
     private static final org.slf4j.Logger LOG = Logger.getLogger();
-
     private static final String companyID = "company.id";
     private static final String consumerKey = "consumer.key";
     private static final String consumerSecret = "consumer.secret";
@@ -30,24 +22,18 @@ public class ContextFactory {
     private static final String accessTokenSecret = "oauth.accessTokenSecret";
     private static final String bearerToken = "oauth2.accessToken";
 
-
     private static Properties prop;
-
 
     /**
      * Initializes Context for a given app/company profile
-     *
-     * @return
-     * @throws FMSException
      */
     public static Context getContext() throws FMSException {
-
         try {
             loadProperties();
         } catch (IOException e) {
             LOG.error("Error while loading properties", e.getCause());
         }
-        //create oauth object
+
         IAuthorizer oauth;
         if(prop.getProperty("oauth.type").equals("1")) {
             oauth = new OAuthAuthorizer(prop.getProperty(consumerKey), prop.getProperty(consumerSecret), prop.getProperty(accessToken), prop.getProperty(accessTokenSecret));
@@ -55,7 +41,6 @@ public class ContextFactory {
             oauth = new OAuth2Authorizer(prop.getProperty(bearerToken));
         }
 
-        //create context
         return new Context(oauth, ServiceType.QBO, prop.getProperty(companyID));
     }
 

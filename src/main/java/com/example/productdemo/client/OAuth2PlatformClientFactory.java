@@ -8,17 +8,10 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 
-/**
- *
- * @author dderose
- *
- */
 @Service
 @PropertySource(value="classpath:/application.properties", ignoreResourceNotFound=true)
 public class OAuth2PlatformClientFactory {
-
     private final org.springframework.core.env.Environment env;
-
     private OAuth2PlatformClient client;
     private OAuth2Config oauth2Config;
 
@@ -26,15 +19,16 @@ public class OAuth2PlatformClientFactory {
         this.env = env;
     }
 
+    // intitialize a single thread executor, this will ensure only one thread processes the queue
     @PostConstruct
     public void init() {
-        // intitialize a single thread executor, this will ensure only one thread processes the queue
-        oauth2Config = new OAuth2Config.OAuth2ConfigBuilder(env.getProperty("OAuth2AppClientId"), env.getProperty("OAuth2AppClientSecret")) //set client id, secret
-                .callDiscoveryAPI(Environment.SANDBOX) // call discovery API to populate urls
+        //set client id, secret
+        oauth2Config = new OAuth2Config.OAuth2ConfigBuilder(env.getProperty("OAuth2AppClientId"), env.getProperty("OAuth2AppClientSecret"))
+                // call discovery API to populate urls
+                .callDiscoveryAPI(Environment.SANDBOX)
                 .buildConfig();
         client  = new OAuth2PlatformClient(oauth2Config);
     }
-
 
     public OAuth2PlatformClient getOAuth2PlatformClient()  {
         return client;
@@ -47,5 +41,4 @@ public class OAuth2PlatformClientFactory {
     public String getPropertyValue(String propertyName) {
         return env.getProperty(propertyName);
     }
-
 }

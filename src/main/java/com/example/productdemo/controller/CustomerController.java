@@ -1,10 +1,11 @@
 package com.example.productdemo.controller;
 
 import com.example.productdemo.client.OAuth2PlatformClientFactory;
+import com.example.productdemo.entity.po.StoreApiIntuit;
 import com.example.productdemo.helper.QBOServiceHelper;
+import com.example.productdemo.service.IStoreApiIntuitService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intuit.ipp.data.CompanyInfo;
 import com.intuit.ipp.data.Customer;
 import com.intuit.ipp.data.Error;
 import com.intuit.ipp.exception.FMSException;
@@ -18,7 +19,6 @@ import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
@@ -26,25 +26,31 @@ import java.util.List;
 
 @Controller
 public class CustomerController {
-
     private final OAuth2PlatformClientFactory factory;
     private final QBOServiceHelper helper;
     private static final String failureMsg = "Failed";
+    private final IStoreApiIntuitService storeApiIntuitService;
 
-    public CustomerController(OAuth2PlatformClientFactory factory, QBOServiceHelper helper) {
+    public CustomerController(OAuth2PlatformClientFactory factory,
+                              QBOServiceHelper helper,
+                              IStoreApiIntuitService storeApiIntuitService) {
+
         this.factory = factory;
         this.helper = helper;
+        this.storeApiIntuitService = storeApiIntuitService;
     }
 
     @ResponseBody
     @GetMapping("/getCustomer")
     public String getCustomer(HttpSession session) {
 
-        String realmId = (String)session.getAttribute("realmId");
+        StoreApiIntuit storeApiIntuit = storeApiIntuitService.selectBySellerId(12345L);
+        String realmId = storeApiIntuit.getRealm_id();
+
         if (StringUtils.isEmpty(realmId)) {
             return new JSONObject().put("response","No realm ID.  QBO calls only work if the accounting scope was passed!").toString();
         }
-        String accessToken = (String)session.getAttribute("access_token");
+        String accessToken = storeApiIntuit.getAccess_token();
 
         try {
             //get DataService
@@ -122,8 +128,4 @@ public class CustomerController {
 
         return failureMsg;
     }
-
-
-
-
 }

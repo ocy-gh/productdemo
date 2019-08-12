@@ -2,22 +2,91 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.example.productdemo.mapper.StoreApiIntuitMapper">
     <resultMap id="BaseResultMap" type="com.example.productdemo.entity.po.StoreApiIntuit">
-        <id column="realmId" property="realmId" jdbcType="VARCHAR"/>
-        <result column="authCode" property="authCode" jdbcType="VARCHAR"/>
+        <id column="seller_id" property="seller_id" jdbcType="BIGINT"/>
+        <result column="realm_id" property="realm_id" jdbcType="VARCHAR"/>
+        <result column="auth_code" property="auth_code" jdbcType="VARCHAR"/>
         <result column="access_token" property="access_token" jdbcType="VARCHAR"/>
         <result column="refresh_token" property="refresh_token" jdbcType="VARCHAR"/>
+        <result column="expires_in" property="expires_in" jdbcType="BIGINT"/>
+        <result column="x_refresh_token_expires_in" property="x_refresh_token_expires_in" jdbcType="BIGINT"/>
+        <result column="refresh_at" property="refresh_at" jdbcType="VARCHAR"/>
+        <result column="authorize_at" property="authorize_at" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        realmId, authCode, access_token, refresh_token
+        seller_id,
+        realm_id,
+        auth_code,
+        access_token,
+        refresh_token,
+        expires_in,
+        x_refresh_token_expires_in,
+        refresh_at,
+        authorize_at
     </sql>
 
+    <select id="selectBySellerId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+            <include refid="Base_Column_List"/>
+        FROM
+            intuit
+        WHERE
+            seller_id = #{seller_id,jdbcType=BIGINT}
+    </select>
+
     <insert id="insert" parameterType="com.example.productdemo.entity.po.StoreApiIntuit">
-        INSERT into intuit(realmId,authCode,access_token,refresh_token)
-        VALUE
-        (#{realmId,jdbcType=VARCHAR},
-         #{authCode,jdbcType=VARCHAR},
-          #{access_token,jdbcType=VARCHAR},
-          #{refresh_token,jdbcType=VARCHAR})
+        INSERT into
+            intuit
+            (<include refid="Base_Column_List"/>)
+        VALUES
+            (#{seller_id,jdbcType=BIGINT},
+            #{realm_id,jdbcType=VARCHAR},
+            #{auth_code,jdbcType=VARCHAR},
+            #{access_token,jdbcType=VARCHAR},
+            #{refresh_token,jdbcType=VARCHAR},
+            #{expires_in,jdbcType=BIGINT},
+            #{x_refresh_token_expires_in,jdbcType=BIGINT},
+            #{refresh_at,jdbcType=VARCHAR},
+            #{authorize_at,jdbcType=VARCHAR})
     </insert>
+
+    <update id="updateByStoreApiIntuit" parameterType="com.example.productdemo.entity.po.StoreApiIntuit">
+        UPDATE
+            intuit
+
+            <set>
+                <if test="access_token != null">
+                    access_token = #{access_token,jdbcType=VARCHAR},
+                </if>
+
+                <if test="refresh_token != null">
+                    refresh_token = #{refresh_token,jdbcType=VARCHAR},
+                </if>
+
+                <if test="expires_in != null">
+                    expires_in = #{expires_in,jdbcType=BIGINT},
+                </if>
+
+                <if test="x_refresh_token_expires_in != null">
+                    x_refresh_token_expires_in = #{x_refresh_token_expires_in,jdbcType=BIGINT},
+                </if>
+
+                <if test="refresh_at != null">
+                    refresh_at = #{refresh_at,jdbcType=VARCHAR},
+                </if>
+
+                <if test="authorize_at != null">
+                    authorize_at = #{authorize_at,jdbcType=VARCHAR},
+                </if>
+            </set>
+        WHERE
+            seller_id=#{seller_id,jdbcType=BIGINT}
+    </update>
+
+    <delete id="deleteByStoreApiIntuit" parameterType="com.example.productdemo.entity.po.StoreApiIntuit">
+        DELETE FROM
+            intuit
+        WHERE
+            seller_id = #{seller_id,jdbcType=BIGINT}
+    </delete>
 </mapper>

@@ -12,11 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
-/**
- * @author dderose
- *
- */
 @Controller
 public class CallbackController {
 
@@ -33,11 +32,6 @@ public class CallbackController {
      *  The Authorization code has a short lifetime.
      *  Hence Unless a user action is quick and mandatory, proceed to exchange the Authorization Code for
      *  BearerToken
-     *
-     * @param state
-     * @param realmId
-     * @param session
-     * @return
      */
     @RequestMapping("/oauth2redirect")
     public String callBackFromOAuth(@RequestParam("code") String authCode,
@@ -46,29 +40,27 @@ public class CallbackController {
                                     HttpSession session,
                                     Model model) {
 
-        System.out.println("inside oauth2redirect of sample"  );
         try {
-
-            // TODO mybatis insert token here chang session to Credential Object
             String csrfToken = (String) session.getAttribute("csrfToken");
-            if (csrfToken.equals(state)) {
-                session.setAttribute("realmId", realmId);
-                session.setAttribute("auth_code", authCode);
 
+            if (csrfToken.equals(state)) {
                 OAuth2PlatformClient client  = factory.getOAuth2PlatformClient();
                 String redirectUri = factory.getPropertyValue("OAuth2AppRedirectUri");
                 System.out.println("inside oauth2redirect of sample -- redirectUri " + redirectUri  );
 
                 BearerTokenResponse bearerTokenResponse = client.retrieveBearerTokens(authCode, redirectUri);
 
-                session.setAttribute("access_token", bearerTokenResponse.getAccessToken());
-                session.setAttribute("refresh_token", bearerTokenResponse.getRefreshToken());
-
                 StoreApiIntuit storeApiIntuit = new StoreApiIntuit();
-                storeApiIntuit.setRealmId(realmId);
-                storeApiIntuit.setAuthCode(authCode);
+                storeApiIntuit.setSeller_id(12345L);
+                storeApiIntuit.setRealm_id(realmId);
+                storeApiIntuit.setAuth_code(authCode);
                 storeApiIntuit.setAccess_token(bearerTokenResponse.getAccessToken());
                 storeApiIntuit.setRefresh_token(bearerTokenResponse.getRefreshToken());
+                storeApiIntuit.setExpires_in(bearerTokenResponse.getExpiresIn());
+                storeApiIntuit.setX_refresh_token_expires_in(bearerTokenResponse.getXRefreshTokenExpiresIn());
+                String connectAt = LocalDateTime.now(ZoneId.of("Asia/Kuala_Lumpur")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
+                storeApiIntuit.setAuthorize_at(connectAt);
+                storeApiIntuit.setRefresh_at(connectAt);
                 storeApiIntuitService.insert(storeApiIntuit);
 
                 // Update your Data store here with user's AccessToken and RefreshToken along with the realmId
@@ -78,13 +70,11 @@ public class CallbackController {
                 model.addAttribute("refresh_token", bearerTokenResponse.getRefreshToken());
                 return "connected";
             }
-            System.out.println("csrf token mismatch " );
+
         } catch (OAuthException e) {
-            System.out.println("Exception in callback handler ");
             e.printStackTrace();
         }
+
         return null;
     }
-
-
 }
