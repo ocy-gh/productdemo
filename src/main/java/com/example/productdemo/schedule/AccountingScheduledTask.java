@@ -37,7 +37,7 @@ public class AccountingScheduledTask {
         long currentSeconds = LocalDateTime.now(klZoneId).toEpochSecond(klZoneOffset);
         String refreshAt = LocalDateTime.now(ZoneId.of("Asia/Kuala_Lumpur")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
 
-        if(currentSeconds - refreshAtSeconds > 3000) {
+        if(currentSeconds - refreshAtSeconds > 5) {
 
             try {
                 OAuth2PlatformClient client  = factory.getOAuth2PlatformClient();
@@ -54,10 +54,8 @@ public class AccountingScheduledTask {
         }
 
         // TODO: Remind user of authorization expiration date
-        /*
         if(currentSeconds - authorizeAtSeconds > 8600000) {
-
+            System.out.println("Remind user to authorize");
         }
-         */
     }
 }
