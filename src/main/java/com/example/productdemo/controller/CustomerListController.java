@@ -28,6 +28,6 @@ public class CustomerListController {
         Customer customer = new Customer(123L,"S258","shopee","");
         customerService.insertCustomer(customer);
         model.addAttribute("Customer",customer);
-        return "customer";
+        return "connected";
     }
 }
