@@ -14,13 +14,10 @@ import com.intuit.ipp.services.DataService;
 
 /**
  * @author dderose
- *
  */
 public final class ItemHelper {
 
-    private ItemHelper() {
-
-    }
+    private ItemHelper() { }
 
     public static Item getItemFields(DataService service) throws FMSException {
 

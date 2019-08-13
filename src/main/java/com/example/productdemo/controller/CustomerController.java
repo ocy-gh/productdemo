@@ -44,7 +44,7 @@ public class CustomerController {
     @GetMapping("/getCustomer")
     public String getCustomer(HttpSession session) {
 
-        StoreApiIntuit storeApiIntuit = storeApiIntuitService.selectBySellerId(12345L);
+        StoreApiIntuit storeApiIntuit = storeApiIntuitService.selectBySellerId(12345);
         String realmId = storeApiIntuit.getRealm_id();
 
         if (StringUtils.isEmpty(realmId)) {
@@ -65,8 +65,8 @@ public class CustomerController {
             customer.setId(jsonObject.getString("id"));
             customer.setDisplayName(jsonObject.getString("displayName"));
 
-            System.out.println("Customer Name: " + customer.getDisplayName());
-            System.out.println("Customer ID: " + customer.getId());
+            System.out.println("CustomerList Name: " + customer.getDisplayName());
+            System.out.println("CustomerList ID: " + customer.getId());
             return responseString;
         } catch (InvalidTokenException e) {
             System.out.println("Error while calling executeQuery :: " + e.getMessage());
@@ -78,8 +78,8 @@ public class CustomerController {
 
             try {
                 BearerTokenResponse bearerTokenResponse = client.refreshToken(refreshToken);
-                session.setAttribute("access_token", bearerTokenResponse.getAccessToken());
-                session.setAttribute("refresh_token", bearerTokenResponse.getRefreshToken());
+                storeApiIntuit.setAccess_token(bearerTokenResponse.getAccessToken());
+                storeApiIntuit.setAccess_token(bearerTokenResponse.getRefreshToken());
 
                 //call company info again using new tokens
                 System.out.println("calling companyinfo using new tokens");
@@ -94,8 +94,8 @@ public class CustomerController {
                 customer.setId(jsonObject.getString("id"));
                 customer.setDisplayName(jsonObject.getString("displayName"));
 
-                System.out.println("Customer Name: " + customer.getDisplayName());
-                System.out.println("Customer ID: " + customer.getId());
+                System.out.println("CustomerList Name: " + customer.getDisplayName());
+                System.out.println("CustomerList ID: " + customer.getId());
                 return "customer";
             } catch (OAuthException e1) {
                 System.out.println("Error while calling bearer token :: " + e.getMessage());

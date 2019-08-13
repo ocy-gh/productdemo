@@ -11,3 +11,12 @@ CREATE TABLE `intuit` (
     `authorize_at` VARCHAR(32) NOT NULL,
     PRIMARY KEY (`seller_id`)
 ) ENGINE = InnoDB;
+
+DROP TABLE IF EXISTS `customer`;
+CREATE TABLE `customer` (
+    `seller_id` BIGINT(32) NOT NULL,
+    `customer_id` VARCHAR(64) NOT NULL ,
+    `customer_name` VARCHAR(255) NOT NULL,
+    `created_at` VARCHAR(64) NOT NULL,
+    PRIMARY KEY (`seller_id`, `customer_id`)
+) ENGINE = InnoDB;

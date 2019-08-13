@@ -37,7 +37,7 @@ public class AccountingScheduledTask {
         long currentSeconds = LocalDateTime.now(klZoneId).toEpochSecond(klZoneOffset);
         String refreshAt = LocalDateTime.now(ZoneId.of("Asia/Kuala_Lumpur")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
 
-        if(currentSeconds - refreshAtSeconds > 5) {
+        if(currentSeconds - refreshAtSeconds > 3000) {
 
             try {
                 OAuth2PlatformClient client  = factory.getOAuth2PlatformClient();

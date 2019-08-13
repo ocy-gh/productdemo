@@ -9,7 +9,7 @@ import com.intuit.ipp.data.WebSiteAddress;
  */
 public final class Address {
 
-    private Address() {
+    public Address() {
 
     }
 

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<table class="table table-centered w-100 dt-responsive nowrap" id="customer-datatable">
+    <thead class="thead-light">
+    <tr>
+        <th class="all" style="width: 20px;">
+            <div class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input" id="customCheck1">
+                <label class="custom-control-label" for="customCheck1">&nbsp;</label>
+            </div>
+        </th>
+        <th class="all">Customer_ID</th>
+        <th>Platform</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="orderLazada:${orderLazadaList}">
+        <td th:type="checkbox"></td>
+        <td th:text="${orderLazada.getStore_id()}"></td>
+        <td th:text="${orderLazada.getOrder_num()}"></td>
+        <td th:text="${orderLazada.getOrder_item()}"></td>
+        <td th:text="${orderLazada.getMsg_to_seller()}"></td>
+        <td th:text="${orderLazada.getDay_to_ship()}"></td>
+        <td th:text="${orderLazada.getCarrier()}"></td>
+        <td th:text="${orderLazada.getPayment_time()}"></td>
+        <td th:text="${orderLazada.getShip_time()}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

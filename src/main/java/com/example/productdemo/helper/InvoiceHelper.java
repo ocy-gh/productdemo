@@ -1,12 +1,8 @@
 package com.example.productdemo.helper;
 
-import com.example.productdemo.entity.po.CustomerRef;
 import com.intuit.ipp.data.*;
 import com.intuit.ipp.exception.FMSException;
 import com.intuit.ipp.services.DataService;
-import com.intuit.ipp.util.DateUtils;
-import com.intuit.oauth2.data.Address;
-import org.apache.commons.lang.RandomStringUtils;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -14,68 +10,33 @@ import java.util.ArrayList;
 import java.util.List;
 /**
  * @author dderose
- *
  */
 public final class InvoiceHelper {
 
-    private InvoiceHelper() {
+    private InvoiceHelper() { }
 
-    }
-
-    public static Invoice getInvoiceFields(DataService service) throws FMSException, ParseException {
+    public static Invoice getInvoiceFields(DataService service) throws FMSException {
         Invoice invoice = new Invoice();
 
-        // Mandatory Fields
-        invoice.setDocNumber(RandomStringUtils.randomAlphanumeric(5));
+        ReferenceType referenceType = new ReferenceType();
+        referenceType.setValue("1");
+        referenceType.setName("CustomerRef");
 
-        try {
-            invoice.setTxnDate(DateUtils.getCurrentDateTime());
-        } catch (ParseException e) {
-            throw new FMSException("ParseException while getting current date.");
-        }
-
-        Customer customer = CustomerHelper.getCustomer(service);
-        CustomerRef customerRef = new CustomerRef();
-        customerRef.setValue("");
-//        invoice.setCustomerRef("Shopee Malaysia");
-
-        invoice.setPrivateNote("Testing");
-        invoice.setTxnStatus("Payable");
-        invoice.setBalance(new BigDecimal("10000"));
-
-        PhysicalAddress billingAdd = new PhysicalAddress();
-        billingAdd.setLine1("123 Main St");
-        billingAdd.setCity("Mountain View");
-        billingAdd.setCountry("United States");
-        billingAdd.setCountrySubDivisionCode("CA");
-        billingAdd.setPostalCode("94043");
-
-        invoice.setBillAddr(billingAdd);
-
-        List<Line> invLine = new ArrayList<Line>();
-        Line line = new Line();
-        line.setDescription("New test (14.48mm)\nGiftBox: Red Heart Gift Box [ £ 3.00]");
-        line.setAmount(new BigDecimal("10000"));
-        line.setDetailType(LineDetailTypeEnum.SALES_ITEM_LINE_DETAIL);
-
-
-        SalesItemLineDetail silDetails = new SalesItemLineDetail();
-
-        Address address = new Address();
-
+        SalesItemLineDetail salesItemLineDetail = new SalesItemLineDetail();
         Item item = ItemHelper.getItem(service);
-        silDetails.setItemRef(ItemHelper.getItemRef(item));
+        salesItemLineDetail.setItemRef(ItemHelper.getItemRef(item));
 
-        line.setSalesItemLineDetail(silDetails);
-        invLine.add(line);
-        invoice.setLine(invLine);
+        List<Line> listList = new ArrayList<>();
+        Line line = new Line();
+        line.setDetailType(LineDetailTypeEnum.SALES_ITEM_LINE_DETAIL);
+        line.setAmount(BigDecimal.valueOf(100));
+        line.setSalesItemLineDetail(salesItemLineDetail);
+        listList.add(line);
 
-        invoice.setRemitToRef(CustomerHelper.getCustomerRef(customer));
-
-        invoice.setPrintStatus(PrintStatusEnum.NEED_TO_PRINT);
-        invoice.setTotalAmt(new BigDecimal("10000"));
-        invoice.setFinanceCharge(false);
+        invoice.setCustomerRef(referenceType);
+        invoice.setLine(listList);
 
         return invoice;
     }
+
 }
